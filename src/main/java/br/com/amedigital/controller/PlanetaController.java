@@ -3,6 +3,8 @@ package br.com.amedigital.controller;
 import java.util.List;
 import java.util.Optional;
 
+import javax.naming.ServiceUnavailableException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.amedigital.dao.PlanetaApiDao;
 import br.com.amedigital.dao.PlanetaDao;
 import br.com.amedigital.entidade.Planeta;
+import br.com.amedigital.entidade.PlanetaApi;
 import br.com.amedigital.service.PlanetaService;
 
 @RestController
@@ -28,6 +32,9 @@ public class PlanetaController {
 	@Autowired
 	private PlanetaDao planetaDao;
 
+	@Autowired
+	private PlanetaApiDao planetaApiDao;
+
 	@GetMapping
 	public Page<Planeta> listar(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
 			@RequestParam(value = "size", required = false, defaultValue = "5") int size) {
@@ -38,6 +45,12 @@ public class PlanetaController {
 	public List<Optional<Planeta>> buscarPorIdOuPorNome(@RequestParam(value = "nome", required = false) String nome,
 			@RequestParam(value = "id", required = false) Integer id) {
 		return planetaDao.findByIdOrNome(id, nome);
+	}
+
+	@GetMapping("/api")
+	public List<PlanetaApi> listarPlanetasApi() throws ServiceUnavailableException {
+		List<PlanetaApi> planetasApi = planetaApiDao.listar().getBody().getResults();
+		return planetasApi;
 	}
 
 	@PostMapping
